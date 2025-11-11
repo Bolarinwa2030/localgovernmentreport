@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem;">User Management</h1>
+
+<div class="card">
+    <h2 style="margin-bottom: 1.5rem;">All Registered Users</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th>Registered</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.full_name }}</td>
+                <td><strong>{{ user.username }}</strong></td>
+                <td>{{ user.email }}</td>
+                <td>
+                    <span class="badge" style="background: {% if user.role.value == 'admin' %}#dc3545{% elif user.role.value == 'staff' %}#17a2b8{% else %}#28a745{% endif %}; color: white;">
+                        {{ user.role.value.title() }}
+                    </span>
+                </td>
+                <td>{{ user.phone or 'N/A' }}</td>
+                <td>
+                    {% if user.is_active %}
+                    <span class="badge badge-resolved">Active</span>
+                    {% else %}
+                    <span class="badge" style="background: #6c757d; color: white;">Inactive</span>
+                    {% endif %}
+                </td>
+                <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card" style="margin-top: 2rem;">
+    <h3 style="margin-bottom: 1rem; color: #667eea;">User Statistics</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <div>
+            <strong>Total Users:</strong>
+            <p style="font-size: 1.5rem; color: #667eea; margin-top: 0.5rem;">{{ users|length }}</p>
+        </div>
+        <div>
+            <strong>Citizens:</strong>
+            <p style="font-size: 1.5rem; color: #28a745; margin-top: 0.5rem;">{{ users|selectattr('role.value', 'equalto', 'citizen')|list|length }}</p>
+        </div>
+        <div>
+            <strong>Staff:</strong>
+            <p style="font-size: 1.5rem; color: #17a2b8; margin-top: 0.5rem;">{{ users|selectattr('role.value', 'equalto', 'staff')|list|length }}</p>
+        </div>
+        <div>
+            <strong>Admins:</strong>
+            <p style="font-size: 1.5rem; color: #dc3545; margin-top: 0.5rem;">{{ users|selectattr('role.value', 'equalto', 'admin')|list|length }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}My Dashboard{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem;">Welcome, {{ user.full_name }}!</h1>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>{{ stats.total }}</h3>
+        <p>Total Complaints</p>
+    </div>
+    
+    <div class="stat-card">
+        <h3>{{ stats.pending }}</h3>
+        <p>Pending</p>
+    </div>
+    
+    <div class="stat-card">
+        <h3>{{ stats.in_progress }}</h3>
+        <p>In Progress</p>
+    </div>
+    
+    <div class="stat-card">
+        <h3>{{ stats.resolved }}</h3>
+        <p>Resolved</p>
+    </div>
+</div>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2>My Complaints</h2>
+        <a href="{{ url_for('new_complaint') }}" class="btn btn-primary">+ New Complaint</a>
+    </div>
+    
+    {% if complaints %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Ticket</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Created</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for complaint in complaints %}
+                <tr>
+                    <td><strong>{{ complaint.ticket_number }}</strong></td>
+                    <td>{{ complaint.title }}</td>
+                    <td>{{ complaint.category }}</td>
+                    <td>
+                        <span class="badge badge-{{ complaint.status.value }}">
+                            {{ complaint.status.value.replace('_', ' ').title() }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge badge-{{ complaint.priority.value }}">
+                            {{ complaint.priority.value.title() }}
+                        </span>
+                    </td>
+                    <td>{{ complaint.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        <a href="{{ url_for('view_complaint', complaint_id=complaint.id) }}" class="btn btn-primary" style="padding: 0.4rem 1rem; font-size: 0.9rem;">
+                            View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p style="text-align: center; padding: 2rem; color: #666;">
+            You haven't submitted any complaints yet.
+            <a href="{{ url_for('new_complaint') }}" style="color: #667eea;">Submit your first complaint</a>
+        </p>
+    {% endif %}
+</div>
+{% endblock %}

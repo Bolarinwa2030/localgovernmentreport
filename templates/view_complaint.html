@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Complaint #{{ complaint.ticket_number }}{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 1rem;">
+    <a href="{% if session.role in ['admin', 'staff'] %}{{ url_for('admin_dashboard') }}{% else %}{{ url_for('user_dashboard') }}{% endif %}" style="color: #667eea; text-decoration: none;">
+        ← Back to Dashboard
+    </a>
+</div>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 2rem;">
+        <div>
+            <h1 style="margin-bottom: 0.5rem;">{{ complaint.title }}</h1>
+            <p style="color: #666;">Ticket: <strong>{{ complaint.ticket_number }}</strong></p>
+        </div>
+        <div style="text-align: right;">
+            <span class="badge badge-{{ complaint.status.value }}" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                {{ complaint.status.value.replace('_', ' ').title() }}
+            </span>
+            <br>
+            <span class="badge badge-{{ complaint.priority.value }}" style="font-size: 0.9rem; padding: 0.4rem 0.8rem; margin-top: 0.5rem;">
+                {{ complaint.priority.value.title() }} Priority
+            </span>
+        </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; padding: 1.5rem; background: #f8f9fa; border-radius: 5px;">
+        <div>
+            <strong style="color: #666;">Category:</strong>
+            <p style="margin-top: 0.3rem;">{{ complaint.category }}</p>
+        </div>
+        <div>
+            <strong style="color: #666;">Location:</strong>
+            <p style="margin-top: 0.3rem;">{{ complaint.location or 'Not specified' }}</p>
+        </div>
+        <div>
+            <strong style="color: #666;">Submitted By:</strong>
+            <p style="margin-top: 0.3rem;">{{ complaint.user.full_name }}</p>
+        </div>
+        <div>
+            <strong style="color: #666;">Date Submitted:</strong>
+            <p style="margin-top: 0.3rem;">{{ complaint.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        </div>
+        {% if complaint.assigned_to_user %}
+        <div>
+            <strong style="color: #666;">Assigned To:</strong>
+            <p style="margin-top: 0.3rem;">{{ complaint.assigned_to_user.full_name }}</p>
+        </div>
+        {% endif %}
+        {% if complaint.escalation_count > 0 %}
+        <div>
+            <strong style="color: #666;">Escalations:</strong>
+            <p style="margin-top: 0.3rem;">{{ complaint.escalation_count }} time(s)</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div style="margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1rem;">Description</h3>
+        <p style="line-height: 1.8; white-space: pre-wrap;">{{ complaint.description }}</p>
+    </div>
+    
+    {% if session.role in ['admin', 'staff'] %}
+    <div style="border-top: 2px solid #e1e8ed; padding-top: 2rem; margin-top: 2rem;">
+        <h3 style="margin-bottom: 1rem;">Admin Actions</h3>
+        <form method="POST" action="{{ url_for('update_complaint', complaint_id=complaint.id) }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div class="form-group">
+                <label>Status</label>
+                <select name="status" class="form-control">
+                    <option value="PENDING" {% if complaint.status.value == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="ACKNOWLEDGED" {% if complaint.status.value == 'acknowledged' %}selected{% endif %}>Acknowledged</option>
+                    <option value="IN_PROGRESS" {% if complaint.status.value == 'in_progress' %}selected{% endif %}>In Progress</option>
+                    <option value="ESCALATED" {% if complaint.status.value == 'escalated' %}selected{% endif %}>Escalated</option>
+                    <option value="RESOLVED" {% if complaint.status.value == 'resolved' %}selected{% endif %}>Resolved</option>
+                    <option value="CLOSED" {% if complaint.status.value == 'closed' %}selected{% endif %}>Closed</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Priority</label>
+                <select name="priority" class="form-control">
+                    <option value="LOW" {% if complaint.priority.value == 'low' %}selected{% endif %}>Low</option>
+                    <option value="MEDIUM" {% if complaint.priority.value == 'medium' %}selected{% endif %}>Medium</option>
+                    <option value="HIGH" {% if complaint.priority.value == 'high' %}selected{% endif %}>High</option>
+                    <option value="CRITICAL" {% if complaint.priority.value == 'critical' %}selected{% endif %}>Critical</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; align-items: end;">
+                <button type="submit" class="btn btn-success" style="width: 100%;">Update</button>
+            </div>
+        </form>
+        
+        <form method="POST" action="{{ url_for('escalate_complaint', complaint_id=complaint.id) }}" style="margin-top: 1rem;">
+            <button type="submit" class="btn btn-warning" onclick="return confirm('Escalate this complaint?')">
+                ⚠️ Escalate Complaint
+            </button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2 style="margin-bottom: 1.5rem;">Responses & Updates</h2>
+    
+    {% if responses %}
+        {% for response in responses %}
+        <div style="padding: 1.5rem; background: {% if response.is_internal %}#fff3cd{% else %}#f8f9fa{% endif %}; border-left: 4px solid {% if response.is_internal %}#ffc107{% else %}#667eea{% endif %}; margin-bottom: 1rem; border-radius: 5px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <strong style="color: #667eea;">{{ response.responder.full_name }}</strong>
+                <span style="color: #666; font-size: 0.9rem;">{{ response.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+            </div>
+            {% if response.is_internal %}
+            <span class="badge badge-warning" style="margin-bottom: 0.5rem;">Internal Note</span>
+            {% endif %}
+            <p style="margin-top: 0.5rem; line-height: 1.6; white-space: pre-wrap;">{{ response.message }}</p>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p style="text-align: center; padding: 2rem; color: #666;">No responses yet.</p>
+    {% endif %}
+    
+    <div style="border-top: 2px solid #e1e8ed; padding-top: 2rem; margin-top: 2rem;">
+        <h3 style="margin-bottom: 1rem;">Add Response</h3>
+        <form method="POST" action="{{ url_for('respond_to_complaint', complaint_id=complaint.id) }}">
+            <div class="form-group">
+                <textarea name="message" class="form-control" rows="4" required 
+                          placeholder="Type your response or update here..."></textarea>
+            </div>
+            
+            {% if session.role in ['admin', 'staff'] %}
+            <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" id="internal" name="internal">
+                <label for="internal" style="margin: 0;">Mark as internal note (not visible to citizen)</label>
+            </div>
+            {% endif %}
+            
+            <button type="submit" class="btn btn-primary">Post Response</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

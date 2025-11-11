@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Reports & Analytics{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem;">Reports & Analytics</h1>
+
+<div class="card">
+    <h2 style="margin-bottom: 1.5rem;">Complaint Statistics</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="stat-card">
+            <h3>{{ total }}</h3>
+            <p>Total Complaints</p>
+        </div>
+        
+        {% for status, count in status_counts.items() %}
+        <div class="stat-card">
+            <h3>{{ count }}</h3>
+            <p>{{ status.replace('_', ' ').title() }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="card">
+    <h2 style="margin-bottom: 1.5rem;">Complaints by Category</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Count</th>
+                <th>Percentage</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category, in category_counts %}
+            <tr>
+                <td><strong>{{ category }}</strong></td>
+                <td>{{ category_counts|selectattr('0', 'equalto', category)|list|length }}</td>
+                <td>
+                    <div style="background: #e1e8ed; border-radius: 10px; height: 20px; overflow: hidden;">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100%; width: {{ (category_counts|selectattr('0', 'equalto', category)|list|length / total * 100) if total > 0 else 0 }}%;"></div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+    <div class="card">
+        <h3 style="margin-bottom: 1rem; color: #667eea;">Status Breakdown</h3>
+        {% for status, count in status_counts.items() %}
+        <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: #f8f9fa; margin-bottom: 0.5rem; border-radius: 5px;">
+            <span>{{ status.replace('_', ' ').title() }}</span>
+            <strong>{{ count }}</strong>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="card">
+        <h3 style="margin-bottom: 1rem; color: #667eea;">Resolution Metrics</h3>
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 5px; margin-bottom: 0.5rem;">
+            <strong>Completion Rate:</strong>
+            <p style="font-size: 1.5rem; color: #28a745; margin-top: 0.5rem;">
+                {{ "%.1f"|format((status_counts.get('resolved', 0) / total * 100) if total > 0 else 0) }}%
+            </p>
+        </div>
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 5px;">
+            <strong>Escalation Rate:</strong>
+            <p style="font-size: 1.5rem; color: #dc3545; margin-top: 0.5rem;">
+                {{ "%.1f"|format((status_counts.get('escalated', 0) / total * 100) if total > 0 else 0) }}%
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 2rem;">
+    <h3 style="margin-bottom: 1rem; color: #667eea;">Export Options</h3>
+    <p style="color: #666; margin-bottom: 1rem;">Download reports for further analysis</p>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <button class="btn btn-success" onclick="alert('CSV export functionality would be implemented here')">
+            📊 Export to CSV
+        </button>
+        <button class="btn btn-primary" onclick="alert('PDF export functionality would be implemented here')">
+            📄 Export to PDF
+        </button>
+    </div>
+</div>
+{% endblock %}

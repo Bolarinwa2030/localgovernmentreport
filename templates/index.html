@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Community Complaint System{% endblock %}
+
+{% block content %}
+<div class="card" style="text-align: center; padding: 3rem;">
+    <h1 style="font-size: 2.5rem; margin-bottom: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Welcome to Community Complaint System
+    </h1>
+    <p style="font-size: 1.2rem; color: #666; margin-bottom: 2rem;">
+        Your voice matters. Report issues, track progress, and help build a better community.
+    </p>
+    
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ url_for('register') }}" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">
+            Get Started
+        </a>
+        <a href="{{ url_for('login') }}" class="btn" style="background: white; color: #667eea; border: 2px solid #667eea; font-size: 1.1rem; padding: 1rem 2rem;">
+            Login
+        </a>
+    </div>
+</div>
+
+<div class="stats-grid" style="margin-top: 3rem;">
+    <div class="stat-card">
+        <div style="font-size: 3rem; margin-bottom: 0.5rem;">📝</div>
+        <h3>Submit</h3>
+        <p>File complaints easily online</p>
+    </div>
+    
+    <div class="stat-card">
+        <div style="font-size: 3rem; margin-bottom: 0.5rem;">👁️</div>
+        <h3>Track</h3>
+        <p>Monitor complaint status in real-time</p>
+    </div>
+    
+    <div class="stat-card">
+        <div style="font-size: 3rem; margin-bottom: 0.5rem;">✅</div>
+        <h3>Resolve</h3>
+        <p>Get issues resolved efficiently</p>
+    </div>
+    
+    <div class="stat-card">
+        <div style="font-size: 3rem; margin-bottom: 0.5rem;">📊</div>
+        <h3>Transparency</h3>
+        <p>Full visibility into resolution process</p>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 3rem;">
+    <h2 style="margin-bottom: 1.5rem; color: #667eea;">How It Works</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+        <div>
+            <h3 style="color: #667eea; margin-bottom: 0.5rem;">1. Register</h3>
+            <p>Create your account to get started</p>
+        </div>
+        
+        <div>
+            <h3 style="color: #667eea; margin-bottom: 0.5rem;">2. Submit Complaint</h3>
+            <p>Describe your issue with details and location</p>
+        </div>
+        
+        <div>
+            <h3 style="color: #667eea; margin-bottom: 0.5rem;">3. Track Progress</h3>
+            <p>Receive updates on your complaint status</p>
+        </div>
+        
+        <div>
+            <h3 style="color: #667eea; margin-bottom: 0.5rem;">4. Get Resolution</h3>
+            <p>Complaints are addressed by government officials</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
